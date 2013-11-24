@@ -6,9 +6,6 @@ import itertools
 import collections
 from datetime import datetime
 import csv
-import decimal
-D = decimal.Decimal
-decimal.getcontext().prec = 6
 
 class InvalidOrderException(Exception): pass
 class InvalidStateException(Exception): pass
@@ -31,14 +28,10 @@ class Bar(object):
 		(dt, cd, opn, hgh, lw, cls) = str.split(',')
 		self.date = datetime(int(dt[0:4]), int(dt[4:6]), int(dt[6:8]), int(dt[9:11]))
 		self.symbol = sym
-		#self.op = float(opn)
-		#self.hi = float(hgh)
-		#self.lo = float(lw)
-		#self.cl = float(cls)
-		self.op = D(opn)
-		self.hi = D(hgh)
-		self.lo = D(lw)
-		self.cl = D(cls)
+		self.op = float(opn)
+		self.hi = float(hgh)
+		self.lo = float(lw)
+		self.cl = float(cls)
 
 
 	def __merge_bar(self, b):
@@ -74,14 +67,10 @@ class YahooBar(Bar):
 		(dt, opn, hgh, lw, cls, vol, acls) = str.split(',')
 		self.date = datetime(int(dt[0:4]), int(dt[5:7]), int(dt[8:10]))
 		self.symbol = sym 
-		#self.op = float(opn)
-		#self.hi = float(hgh)
-		#self.lo = float(lw)
-		#self.cl = float(cls)
-		self.op = D(opn)
-		self.hi = D(hgh)
-		self.lo = D(lw)
-		self.cl = D(cls)
+		self.op = float(opn)
+		self.hi = float(hgh)
+		self.lo = float(lw)
+		self.cl = float(cls)
 
 class Order(object):
 
@@ -119,15 +108,6 @@ class Order(object):
 		self.link = link
 		self._state = Order.UNSUB
 		self.nbars = 0
-
-	def __get_level(self):
-		return self._level
-	def __set_level(self, x):
-		if not x is None and not isinstance(x, decimal.Decimal):
-			self._level = D(str(x))
-		else:
-			self._level = x 
-	level = property(__get_level, __set_level)
 
 	def __eq__(self, other):
 
@@ -477,42 +457,6 @@ class Position(object):
 
 	value = property(__get_value)
 
-	def __set_entry(self, x):
-		if not x is None and not isinstance(x, decimal.Decimal):
-			self._entry = D(str(x))
-		else:
-			self._entry = x
-	def __get_entry(self):
-		return self._entry
-	entry = property(__get_entry, __set_entry)
-
-	def __set_mark(self, x):
-		if not x is None and not isinstance(x, decimal.Decimal):
-			self._mark = D(str(x))
-		else:
-			self._mark = x
-	def __get_mark(self):
-		return self._mark
-	mark = property(__get_mark, __set_mark)
-	
-	def __set_size(self, x):
-		if not x is None and not isinstance(x, decimal.Decimal):
-			self._size = D(str(x))
-		else:
-			self._size = x
-	def __get_size(self):
-		return self._size
-	size = property(__get_size, __set_size)
-
-	def __set_exit(self, x):
-		if not x is None and not isinstance(x, decimal.Decimal):
-			self._exit = D(str(x))
-		else:
-			self._exit = x
-	def __get_exit(self):
-		return self._exit
-	exit = property(__get_exit, __set_exit)
-
 	def __get_closed(self):
 		return not self.exit is None
 	closed = property(__get_closed)
@@ -686,9 +630,8 @@ class PositionList(object):
 class BackTest(object):
 
 	def __init__(self, equity=100000):
-		deq = D(str(equity))
-		self.equity = deq #equity
-		self.max_equity = self.min_equity = deq #equity
+		self.equity = equity
+		self.max_equity = self.min_equity = equity
 		self.max_risk = 0.01
 		self.eqvals = []
 		self.bars = {} 
@@ -696,42 +639,6 @@ class BackTest(object):
 		self.book = OrderBook(debug=False)
 		self.poslist = PositionList(close_cb=self.close_cb, open_cb=self.open_cb)
 		
-
-	def __get_max_equity(self):
-		return self._max_equity
-	def __set_max_equity(self, x):
-		if not isinstance(x, decimal.Decimal):
-			self._max_equity = D(str(x))
-		else:
-			self._max_equity = x
-	max_equity = property(__get_max_equity, __set_max_equity)
-
-	def __get_min_equity(self):
-		return self._min_equity
-	def __set_min_equity(self, x):
-		if not isinstance(x, decimal.Decimal):
-			self._min_equity = D(str(x))
-		else:
-			self._min_equity = x
-	min_equity = property(__get_min_equity, __set_min_equity)
-
-	def __get_equity(self):
-		return self._equity
-	def __set_equity(self, x):
-		if not isinstance(x, decimal.Decimal):
-			self._equity = D(str(x))
-		else:
-			self._equity = x
-	equity = property(__get_equity, __set_equity)
-
-	def __get_max_risk(self):
-		return self._max_risk
-	def __set_max_risk(self, x):
-		if not isinstance(x, decimal.Decimal):
-			self._max_risk = D(str(x))
-		else:
-			self._max_risk = x
-	max_risk = property(__get_max_risk, __set_max_risk)
 
 	#override this
 	def on_close(self, p):
@@ -876,7 +783,7 @@ class BackTest(object):
 				nlos += 1
 				totlos += p.value
 
-		tot_pos = D(nwin + nlos + nbe)
+		tot_pos = nwin + nlos + nbe
 		print "%d won %d los" % (nwin, nlos)
 		if nwin == 0 or nlos == 0:
 			print "final equity: %.2f max %.2f min %.2f" % (self.equity, self.max_equity, 

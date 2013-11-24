@@ -424,20 +424,20 @@ class TestPosition(unittest.TestCase):
 		self.aEq(p.value, 0) 
 
 		p.mark = 1.0001
-		self.aEq(p.value, 1)
+		self.aEq(round(p.value), 1)
 
 		p.mark = 0.9999
-		self.aEq(p.value, -1)
+		self.aEq(round(p.value), -1)
 
 	def testValueShort(self):
 		p = Position(self.sym, entry=1.0000, size=-10000)
 		self.aEq(p.value, 0)
 	
 		p.mark = 1.0001
-		self.aEq(p.value, -1)
+		self.aEq(round(p.value), -1)
 	
 		p.mark = 0.9999
-		self.aEq(p.value, 1)
+		self.aEq(round(p.value), 1)
 
 	def testToStr(self):
 
@@ -587,16 +587,16 @@ class TestPositionList(unittest.TestCase):
 		self.aEq(self.pl.value(), 0)
 
 		p1.mark = 1.0001
-		self.aEq(self.pl.value(), 1)
+		self.aEq(round(self.pl.value()), 1)
 
 		p2.mark = 0.9998
-		self.aEq(self.pl.value(), 3)
+		self.aEq(round(self.pl.value()), 3)
 
 		p1.mark = 0.9999
-		self.aEq(self.pl.value(), 1)
+		self.aEq(round(self.pl.value()), 1)
 
 		p2.mark = 1.0001
-		self.aEq(self.pl.value(), -2)
+		self.aEq(round(self.pl.value()), -2)
 
 	def testSymOpen(self):
 
